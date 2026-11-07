@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<div class="home-page">
+
+<section class="how" aria-labelledby="how-title">
+  <h2 id="how-title">How it works</h2>
+  <p class="muted">Yoooooo I be moving, here you can find stuff I need to get rid off, if you want it, it's yours. If someone else wants the same item, you can bid eachother. Some items don't start for free, but you can try to lowball me as much as you want.</p>
+  <ol class="how-steps">
+    <li>
+      <strong>Browse</strong>
+      <span>Open an item to see more photos, the description and the current bids.</span>
+    </li>
+    <li>
+      <strong>Call dibs</strong>
+      <span>Press <em>Dibs!</em> to claim it at the asking price, or make a lower offer. I'll accept or reject offers below the asking price.</span>
+    </li>
+    <li>
+      <strong>Bid if needed</strong>
+      <span>If someone else wants it too, it becomes an auction: bid at least € 0,10 more than the current top bid or offer.</span>
+    </li>
+    <li>
+      <strong>Changed your mind?</strong>
+      <span>Press <em>Remove my dibs</em> on the item page. When I close an item, it goes to the highest bidder.</span>
+    </li>
+  </ol>
+</section>
+
+<% if (!items.length) { %>
+  <p class="empty">Nothing here yet. Check back soon!</p>
+<% } %>
+
+<div class="cards">
+  <% items.forEach((item) => { const b = badge(item); %>
+    <a class="card <%= item.status !== 'available' ? 'closed' : '' %>" href="/item/<%= item.id %>">
+      <%- include('partials/photo', { item }) %>
+      <div class="card-body">
+        <h3><%= item.name %></h3>
+        <span class="badge badge-<%= b.cls %>"><%= b.text %></span>
+        <% if (item.top) { %>
+          <ol class="topbids">
+            <% item.top.forEach((bid) => { %>
+              <li><span><%= bid.name %><% if (bid.status === 'pending') { %> <small class="tag tag-pending">offer</small><% } %></span><strong><%= money(bid.amount) %></strong></li>
+            <% }) %>
+          </ol>
+          <% if (item.bid_count > item.top.length) { %>
+            <small class="muted">+ <%= item.bid_count - item.top.length %> more bids</small>
+          <% } %>
+        <% } else { %>
+          <p class="price"><%= price(item.start_price) %></p>
+        <% } %>
+      </div>
+    </a>
+  <% }) %>
+</div>
+
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,22 @@
+  </main>
+
+  <% if (locals.flash) { %>
+    <div class="snackbar snackbar-<%= flash.type %>" role="<%= flash.type === 'error' ? 'alert' : 'status' %>">
+      <span><%= flash.msg %></span>
+      <button type="button" aria-label="Dismiss">&times;</button>
+    </div>
+    <script>
+      // Snackbar: floats over the page, hides itself after a few seconds or on click.
+      (() => {
+        const bar = document.querySelector('.snackbar');
+        const hide = () => {
+          bar.classList.add('snackbar-hide');
+          setTimeout(() => bar.remove(), 300);
+        };
+        bar.querySelector('button').addEventListener('click', hide);
+        setTimeout(hide, bar.classList.contains('snackbar-error') ? 8000 : 5000);
+      })();
+    </script>
+  <% } %>
+</body>
+</html>

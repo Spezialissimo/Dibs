@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+
+<article class="narrow">
+  <h2>Welcome to Dibs</h2>
+  <p>I'm moving and giving away or selling my stuff. Log in, or create an account with just a name
+    and a password. The same login works on every device.</p>
+
+  <% if (locals.error) { %>
+    <p class="flash flash-error" role="alert"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="<%= nextUrl %>">
+    <label>
+      Name
+      <input name="name" value="<%= name %>" required maxlength="40" autocomplete="username" autofocus>
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" required minlength="4" autocomplete="current-password">
+    </label>
+    <div class="grid">
+      <button type="submit">Log in</button>
+      <button type="submit" formaction="/register" class="secondary">Create account</button>
+    </div>
+  </form>
+</article>
+
+<%- include('partials/footer') %>

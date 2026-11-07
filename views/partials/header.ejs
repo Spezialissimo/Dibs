@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= locals.title ? `${title} · Dibs` : 'Dibs' %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><a href="/" class="brand">Dibs</a></li>
+        <% if (locals.isAdmin) { %>
+          <li><a href="/admin">Items</a></li>
+          <li><a href="/admin/users">Users</a></li>
+        <% } %>
+      </ul>
+      <% if (locals.user) { %>
+        <ul>
+          <li class="hello">Hi, <strong><%= user.name %></strong></li>
+          <li>
+            <form method="post" action="/logout" class="inline">
+              <button class="outline secondary small">Log out</button>
+            </form>
+          </li>
+        </ul>
+      <% } %>
+    </nav>
+  </header>
+  <main class="container">

@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+<h2>Users (<%= users.length %>)</h2>
+<% if (!users.length) { %>
+  <p class="muted">Nobody has signed up yet.</p>
+<% } else { %>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Name</th><th>Bids</th><th>Joined</th><th>New password</th><th></th></tr></thead>
+      <tbody>
+        <% users.forEach((u) => { %>
+          <tr>
+            <td><%= u.name %></td>
+            <td><%= u.bid_count %></td>
+            <td><%= when(u.created_at) %></td>
+            <td>
+              <form method="post" action="/admin/users/<%= u.id %>/password" class="inline-row">
+                <input name="password" minlength="4" required placeholder="new password" aria-label="New password for <%= u.name %>">
+                <button class="small">Set</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="/admin/users/<%= u.id %>/delete" class="inline"
+                    onsubmit="return confirm('Delete this user and all their bids?')">
+                <button class="danger small">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

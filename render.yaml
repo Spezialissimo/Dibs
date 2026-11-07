@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: dibs
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL # paste your Neon connection string
+        sync: false
+      - key: ADMIN_PASSWORD # pick one
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

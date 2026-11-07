@@ -1,0 +1,180 @@
+:root {
+  --dibs-available: #2e7d32;
+  --dibs-dibs: #1565c0;
+  --dibs-auction: #c2410c;
+  --dibs-closed: #6b7280;
+  --dibs-danger: #b91c1c;
+}
+
+.brand { font-weight: 800; font-size: 1.3rem; text-decoration: none; }
+.hello { color: var(--pico-muted-color); }
+.muted { color: var(--pico-muted-color); }
+.empty { text-align: center; padding: 3rem 0; color: var(--pico-muted-color); }
+
+button.small { padding: 0.3rem 0.7rem; font-size: 0.85rem; margin: 0; }
+button.big { width: 100%; font-size: 1.2rem; }
+button.danger { background: var(--dibs-danger); border-color: var(--dibs-danger); color: #fff; }
+form.inline { display: inline; margin: 0; }
+form.inline-row { display: flex; gap: 0.4rem; margin: 0; }
+form.inline-row input { margin: 0; padding: 0.3rem 0.5rem; height: auto; min-width: 8rem; }
+
+/* inline notes (login error, "you're the highest bidder") */
+.flash { padding: 0.7rem 1rem; border-radius: var(--pico-border-radius); }
+.flash-ok { background: color-mix(in srgb, var(--dibs-available) 15%, transparent); }
+.flash-error { background: color-mix(in srgb, var(--dibs-danger) 15%, transparent); }
+
+/* snackbar: fixed at the bottom, sized to its message, never wider than the page content */
+.snackbar {
+  position: fixed; left: 50%; bottom: 1.5rem; z-index: 1000;
+  transform: translateX(-50%);
+  width: max-content; max-width: min(1000px, calc(100vw - 2rem));
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.2rem;
+  border-radius: var(--pico-border-radius);
+  background: #1f2937; color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: snackbar-in 0.2s ease-out;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.snackbar-error { background: var(--dibs-danger); }
+.snackbar-hide { opacity: 0; transform: translate(-50%, 1rem); }
+.snackbar button {
+  background: none; border: none; color: inherit; opacity: 0.8;
+  padding: 0 0.4rem; margin: 0; font-size: 1.4rem; line-height: 1; width: auto;
+}
+.snackbar button:hover { opacity: 1; }
+@keyframes snackbar-in { from { opacity: 0; transform: translate(-50%, 1rem); } }
+
+.tag {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--dibs-auction); margin-left: 0.3rem;
+}
+
+/* badges */
+.badge {
+  display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 600; color: #fff; background: var(--dibs-closed);
+}
+.badge-available { background: var(--dibs-available); }
+.badge-dibs { background: var(--dibs-dibs); }
+.badge-auction { background: var(--dibs-auction); }
+
+/* photos */
+.photo { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--pico-border-radius); display: block; }
+.nophoto {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pico-muted-border-color); color: var(--pico-muted-color);
+}
+.thumb { width: 64px; }
+.thumb .photo { width: 56px; font-size: 0.6rem; }
+
+/* homepage "How it works" */
+.how { margin-bottom: 2rem; }
+.how h2 { margin-bottom: 0.25rem; }
+.how-steps {
+  list-style: none; padding: 0; margin: 1rem 0 0; counter-reset: step;
+  display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.how-steps li {
+  list-style: none; margin: 0; counter-increment: step;
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 1rem 1.1rem; border-radius: var(--pico-border-radius);
+  background: var(--pico-card-sectioning-background-color);
+}
+.how-steps li strong::before {
+  content: counter(step); display: inline-flex; align-items: center; justify-content: center;
+  width: 1.6rem; height: 1.6rem; margin-right: 0.5rem; border-radius: 50%;
+  background: var(--pico-primary); color: var(--pico-primary-inverse); font-size: 0.85rem;
+}
+.how-steps li span { font-size: 0.9rem; color: var(--pico-muted-color); }
+
+/* card grid */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.card {
+  display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  background: var(--pico-card-background-color); border-radius: var(--pico-border-radius);
+  box-shadow: var(--pico-card-box-shadow); overflow: hidden; transition: transform 0.1s;
+}
+.card:hover { transform: translateY(-2px); }
+.card .photo { border-radius: 0; }
+.card.closed { opacity: 0.55; }
+.card-body { padding: 0.8rem 1rem 1rem; }
+.card-body h3 { font-size: 1.05rem; margin: 0 0 0.4rem; }
+.card-body .price { margin: 0.5rem 0 0; font-weight: 600; }
+.topbids { list-style: none; padding: 0; margin: 0.6rem 0 0.2rem; font-size: 0.9rem; }
+.topbids li { display: flex; justify-content: space-between; gap: 0.5rem; list-style: none; margin: 0; }
+.topbids li:first-child { font-weight: 600; }
+
+/* item page: mobile = one column (photo, then info). */
+.item-layout { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+.desc { white-space: pre-line; margin-top: 1rem; }
+.bids tr.mine td { font-weight: 600; }
+.bids th, .bids td { padding-left: 0.5rem; padding-right: 0.5rem; }
+/* Keep "Name (you) HIGHEST" on one line; the table sizes the column to fit it. */
+.bids td:first-child { white-space: nowrap; }
+
+.gallery-thumbs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+.gallery-thumb {
+  width: 64px; height: 64px; padding: 0; margin: 0; border: 2px solid transparent;
+  background: none; border-radius: var(--pico-border-radius); overflow: hidden; opacity: 0.6;
+}
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-thumb[aria-current] { border-color: var(--pico-primary); opacity: 1; }
+.gallery-thumb:hover { opacity: 1; }
+
+/* item page: desktop = narrower page, sticky gallery on the left, info + bid box on the right. */
+@media (min-width: 768px) {
+  /* Item pages and the homepage share the same content width. */
+  .item-page, .home-page { max-width: 1000px; margin: 0 auto; }
+  /* Proportional columns: at 1000px that's ~440px photo + ~510px info; on small laptops both shrink. */
+  .item-layout { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+  .gallery { position: sticky; top: 1rem; }
+  .gallery-main { object-fit: contain; background: var(--pico-muted-border-color); }
+  .item-info h2 { margin-bottom: 0.4rem; }
+  .bidbox {
+    margin: 1.5rem 0 2rem; padding: 1.2rem 1.4rem;
+    background: var(--pico-card-background-color); box-shadow: var(--pico-card-box-shadow);
+    border-radius: var(--pico-border-radius);
+  }
+  .bidbox > :last-child, .bidbox form:last-child { margin-bottom: 0; }
+}
+
+/* admin photo manager */
+.photo-manager { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.photo-manager figure { position: relative; margin: 0; }
+.photo-manager figcaption { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.photo-manager figcaption form { display: flex; gap: 0.3rem; }
+.cover-tag { position: absolute; top: 0.4rem; left: 0.4rem; }
+
+.narrow { max-width: 28rem; margin: 2rem auto; }
+.table-scroll { overflow-x: auto; }
+
+/* offers (below asking price) */
+.badge-pending { background: #a16207; }
+.tag-pending { color: #a16207; }
+.tag-rejected { color: var(--dibs-danger); }
+a.tag { text-decoration: none; }
+.bids tr.rejected td { color: var(--pico-muted-color); }
+.bids tr.rejected td:nth-child(2) { text-decoration: line-through; }
+.bids td.actions { white-space: nowrap; }
+.bids td.actions form { margin-right: 0.25rem; }
+.flash-pending { background: color-mix(in srgb, #a16207 14%, transparent); }
+.bidbox button.big { margin-bottom: 1.25rem; }
+
+/* Pico scales text up to 131% on wide screens; keep desktop at the normal size.
+   Phones (< 576px) are already 100%, so they're unchanged. */
+@media (min-width: 768px) {
+  :root { --pico-font-size: 100%; }
+}
+
+/* Bids list: below photo + info, full page width on desktop. */
+.bids-section { margin-top: 1rem; }
+@media (min-width: 768px) {
+  .item-page .bids-section { margin-top: 2.5rem; }
+  .item-info h2 { font-size: 1.6rem; }
+  .bidbox { padding: 1rem 1.25rem; margin: 1.25rem 0 0; }
+  .bidbox .flash { padding: 0.5rem 0.8rem; font-size: 0.9rem; }
+  .bidbox small { display: block; margin-top: -0.4rem; }
+  .bids td:last-child { white-space: nowrap; }
+}
+.prices s { color: var(--pico-muted-color); }

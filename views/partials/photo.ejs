@@ -1,0 +1,5 @@
+<% if (item.cover_id) { %>
+  <img class="photo" src="/img/<%= item.cover_id %>" alt="<%= item.name %>" loading="lazy">
+<% } else { %>
+  <div class="photo nophoto">No photo</div>
+<% } %>

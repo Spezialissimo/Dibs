@@ -1,0 +1,125 @@
+<%- include('partials/header') %>
+<% const b = badge(item); %>
+
+<div class="item-page">
+  <p class="back"><a href="/">← All items</a></p>
+
+  <div class="item-layout">
+    <section class="gallery">
+      <% if (imageIds.length) { %>
+        <img class="photo gallery-main" id="gallery-main" src="/img/<%= imageIds[0] %>" alt="<%= item.name %>">
+        <% if (imageIds.length > 1) { %>
+          <div class="gallery-thumbs">
+            <% imageIds.forEach((imgId, i) => { %>
+              <button type="button" class="gallery-thumb" data-src="/img/<%= imgId %>"
+                      aria-label="Photo <%= i + 1 %> of <%= imageIds.length %>"
+                      <%= i === 0 ? 'aria-current=true' : '' %>>
+                <img src="/img/<%= imgId %>" alt="" loading="lazy">
+              </button>
+            <% }) %>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="photo nophoto">No photo</div>
+      <% } %>
+    </section>
+
+    <section class="item-info">
+      <h2><%= item.name %></h2>
+      <span class="badge badge-<%= b.cls %>"><%= b.text %></span>
+
+      <% if (item.description) { %>
+        <p class="desc"><%= item.description %></p>
+      <% } %>
+
+      <div class="bidbox">
+        <% if (lowballedPrice !== null) { %>
+          <p class="prices">
+            Original asking price: <s><%= price(item.start_price) %></s><br>
+            Lowballed price: <strong><%= money(lowballedPrice) %></strong>
+          </p>
+        <% } else { %>
+          <p>Asking price: <strong><%= price(item.start_price) %></strong></p>
+        <% } %>
+
+        <% if (item.status === 'available') { %>
+          <% if (isTop) { %>
+            <p class="flash flash-ok">You're the highest bidder.</p>
+          <% } else { %>
+            <% if (myPending) { %>
+              <p class="flash flash-pending">Your offer of <%= money(myPending.amount) %> is waiting for approval. You can raise it below.</p>
+            <% } %>
+
+            <% if (showDibs) { %>
+              <form method="post" action="/item/<%= item.id %>/bid">
+                <input type="hidden" name="amount" value="<%= toInput(item.start_price) %>">
+                <button class="big">Dibs!</button>
+              </form>
+            <% } %>
+
+            <% if (!showDibs || item.start_price > 0) { %>
+              <form method="post" action="/item/<%= item.id %>/bid">
+                <label for="amount">
+                  <%= showDibs ? 'Or make an offer' : 'Your bid' %><%= minBid > 0 ? ` (minimum ${money(minBid)})` : '' %>
+                </label>
+                <fieldset role="group">
+                  <input id="amount" type="text" name="amount" inputmode="decimal" autocomplete="off"
+                         pattern="\s*(€\s*)?\d+([.,]\d{1,2})?\s*" title="An amount like 5, 2.50 or 2,50" required
+                         <% if (showDibs) { %>placeholder="<%= toInput(minBid) %>"<% } else { %>value="<%= toInput(minBid) %>"<% } %>>
+                  <button><%= showDibs ? 'Offer' : 'Bid' %></button>
+                </fieldset>
+                <% if (needsApproval) { %>
+                  <small class="muted">Offers below the asking price wait for my approval.</small>
+                <% } %>
+              </form>
+            <% } %>
+          <% } %>
+
+          <% if (hasMyBids) { %>
+            <form method="post" action="/item/<%= item.id %>/withdraw"
+                  onsubmit="return confirm('Remove all your dibs, bids and offers on this item?')">
+              <button class="outline secondary">Remove my dibs</button>
+            </form>
+          <% } %>
+        <% } %>
+      </div>
+
+    </section>
+  </div>
+
+  <section class="bids-section">
+    <h3>Bids</h3>
+    <% if (!bids.length) { %>
+      <p class="muted">No bids yet. Be the first!</p>
+    <% } else { %>
+      <div class="table-scroll"><table class="bids">
+        <thead><tr><th>Who</th><th>Amount</th><th>When</th></tr></thead>
+        <tbody>
+          <% bids.forEach((bid) => { %>
+            <tr class="<%= bid.user_id === user.id ? 'mine' : '' %> <%= bid.status === 'rejected' ? 'rejected' : '' %>">
+              <td>
+                <%= bid.name %><%= bid.user_id === user.id ? ' (you)' : '' %>
+                <%- include('partials/bid-tag', { bid, leaderId }) %>
+              </td>
+              <td><%= money(bid.amount) %></td>
+              <td><%= when(bid.created_at) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table></div>
+    <% } %>
+  </section>
+</div>
+
+<script>
+  // Clicking a thumbnail shows it as the main photo.
+  document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
+    thumb.addEventListener('click', () => {
+      document.getElementById('gallery-main').src = thumb.dataset.src;
+      document.querySelectorAll('.gallery-thumb').forEach((t) => t.removeAttribute('aria-current'));
+      thumb.setAttribute('aria-current', 'true');
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

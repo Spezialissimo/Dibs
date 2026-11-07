@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+<div class="item-page">
+  <p class="back"><a href="/admin">← All items</a> · <a href="/item/<%= item.id %>">View public page</a></p>
+
+  <form method="post" action="/admin/items/<%= item.id %>" enctype="multipart/form-data">
+    <label>Name <input name="name" value="<%= item.name %>" required></label>
+    <label>Description <textarea name="description" rows="4"><%= item.description %></textarea></label>
+    <div class="grid">
+      <label>Asking price in €
+        <input name="start_price" inputmode="decimal" value="<%= toInput(item.start_price) %>">
+      </label>
+      <label>Status
+        <select name="status">
+          <% statuses.forEach((s) => { %>
+            <option value="<%= s %>" <%= s === item.status ? 'selected' : '' %>><%= s %></option>
+          <% }) %>
+        </select>
+      </label>
+    </div>
+    <label>Add photos (they go to the end)
+      <input type="file" name="images" accept="image/*" multiple>
+    </label>
+    <button>Save</button>
+  </form>
+
+  <h3 id="photos">Photos (<%= imageIds.length %>)</h3>
+  <% if (!imageIds.length) { %>
+    <p class="muted">No photos yet. Add some above.</p>
+  <% } else { %>
+    <p class="muted">The first photo is the cover shown on the homepage.</p>
+    <div class="photo-manager">
+      <% imageIds.forEach((imgId, i) => { %>
+        <figure>
+          <img class="photo" src="/img/<%= imgId %>" alt="Photo <%= i + 1 %>" loading="lazy">
+          <% if (i === 0) { %><span class="badge badge-dibs cover-tag">Cover</span><% } %>
+          <figcaption>
+            <form method="post" action="/admin/images/<%= imgId %>/move" class="inline">
+              <button name="dir" value="left" class="outline secondary small" <%= i === 0 ? 'disabled' : '' %>
+                      aria-label="Move earlier">◀</button>
+              <button name="dir" value="right" class="outline secondary small" <%= i === imageIds.length - 1 ? 'disabled' : '' %>
+                      aria-label="Move later">▶</button>
+            </form>
+            <form method="post" action="/admin/images/<%= imgId %>/delete" class="inline"
+                  onsubmit="return confirm('Delete this photo?')">
+              <button class="danger small" aria-label="Delete photo">✕</button>
+            </form>
+          </figcaption>
+        </figure>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <h3 id="bids">Bids (<%= bids.length %>)</h3>
+  <% if (!bids.length) { %>
+    <p class="muted">No bids yet.</p>
+  <% } else { %>
+    <p class="muted">Offers below the asking price wait for you. Accepting one makes it count (people can still outbid it);
+      rejecting it lets anyone make a new offer. Lower offers are rejected automatically when a higher one comes in.</p>
+    <div class="table-scroll"><table class="bids">
+      <thead><tr><th>Who</th><th>Amount</th><th>When</th><th></th></tr></thead>
+      <tbody>
+        <% bids.forEach((bid) => { %>
+          <tr class="<%= bid.status === 'rejected' ? 'rejected' : '' %>">
+            <td><%= bid.name %> <%- include('partials/bid-tag', { bid, leaderId }) %></td>
+            <td><%= money(bid.amount) %></td>
+            <td><%= when(bid.created_at) %></td>
+            <td class="actions">
+              <% if (bid.status !== 'accepted') { %>
+                <form method="post" action="/admin/bids/<%= bid.id %>/accept" class="inline">
+                  <button class="small">Accept</button>
+                </form>
+              <% } %>
+              <% if (bid.status !== 'rejected') { %>
+                <form method="post" action="/admin/bids/<%= bid.id %>/reject" class="inline">
+                  <button class="outline small">Reject</button>
+                </form>
+              <% } %>
+              <form method="post" action="/admin/bids/<%= bid.id %>/delete" class="inline"
+                    onsubmit="return confirm('Delete this bid completely?')">
+                <button class="outline secondary small">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table></div>
+  <% } %>
+
+  <hr>
+  <form method="post" action="/admin/items/<%= item.id %>/delete"
+        onsubmit="return confirm('Delete this item, its photos and all its bids?')">
+    <button class="danger small">Delete item</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

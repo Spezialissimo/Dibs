@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+
+<details <%= items.length ? '' : 'open' %>>
+  <summary role="button" class="outline">Add item</summary>
+  <form method="post" action="/admin/items" enctype="multipart/form-data">
+    <label>Name <input name="name" required></label>
+    <label>Description <textarea name="description" rows="3"></textarea></label>
+    <div class="grid">
+      <label>Asking price in € (empty or 0 = free)
+        <input name="start_price" inputmode="decimal" placeholder="0">
+      </label>
+      <label>Photos (first one is the cover, up to 10)
+        <input type="file" name="images" accept="image/*" multiple>
+      </label>
+    </div>
+    <button>Add item</button>
+  </form>
+</details>
+
+<% const waiting = items.reduce((n, i) => n + i.pending_count, 0); %>
+<h2>Items (<%= items.length %>)</h2>
+<% if (waiting) { %>
+  <p class="flash flash-pending"><%= waiting %> offer<%= waiting === 1 ? '' : 's' %> waiting for you to accept or reject.</p>
+<% } %>
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th></th><th>Name</th><th>Asking</th><th>Status</th><th>Bids</th><th>Offers waiting</th><th>Leader</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% items.forEach((item) => { const top = item.top?.find((t) => t.status === 'accepted'); %>
+        <tr>
+          <td class="thumb"><%- include('partials/photo', { item }) %></td>
+          <td><a href="/admin/items/<%= item.id %>"><%= item.name %></a></td>
+          <td><%= price(item.start_price) %></td>
+          <td><span class="badge badge-<%= badge(item).cls %>"><%= item.status %></span></td>
+          <td><%= item.bid_count %></td>
+          <td><% if (item.pending_count) { %><a href="/admin/items/<%= item.id %>#bids" class="tag tag-pending"><%= item.pending_count %> to review</a><% } else { %>–<% } %></td>
+          <td><%= top ? `${money(top.amount)} (${top.name})` : '–' %></td>
+          <td><a href="/admin/items/<%= item.id %>">Edit</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('partials/footer') %>

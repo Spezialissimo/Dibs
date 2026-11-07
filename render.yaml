@@ -3,6 +3,7 @@ services:
     name: dibs
     runtime: node
     plan: free
+    region: frankfurt # same region as the Neon database (AWS eu-central-1)
     buildCommand: npm install
     startCommand: node server.js
     healthCheckPath: /healthz

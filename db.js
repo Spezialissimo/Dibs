@@ -8,6 +8,9 @@ const pool = new Pool({
   // Neon (and any hosted Postgres) needs SSL; a local Docker Postgres doesn't.
   ssl: isLocal ? false : { rejectUnauthorized: false },
   max: 5,
+  // Keep connections open between requests: opening a new one (TLS + auth) costs several round trips.
+  idleTimeoutMillis: 5 * 60 * 1000,
+  keepAlive: true,
 });
 
 // Neon closes idle connections; don't let that crash the process.

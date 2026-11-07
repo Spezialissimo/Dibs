@@ -299,13 +299,14 @@ admin.post('/items', upload, async (req, res) => {
 
 admin.get('/items/:id', async (req, res) => {
   const id = toId(req.params.id);
-  const item = id && (await getItem(id));
+  if (!id) return res.status(404).send('Item not found.');
+  // Independent queries run in parallel: one database round trip instead of three.
+  const [item, bids, imageIds] = await Promise.all([getItem(id), getBids(id), getImageIds(id)]);
   if (!item) return res.status(404).send('Item not found.');
-  const bids = await getBids(id);
   res.render('admin-edit', {
     title: `Edit ${item.name}`,
     item,
-    imageIds: await getImageIds(id),
+    imageIds,
     bids,
     leaderId: bids.find((b) => b.status === 'accepted')?.id,
     statuses: STATUSES,
@@ -465,10 +466,11 @@ app.get('/', async (req, res) => {
 
 app.get('/item/:id', async (req, res) => {
   const id = toId(req.params.id);
-  const item = id && (await getItem(id));
+  if (!id) return res.status(404).render('notfound', { title: 'Not found' });
+  // Independent queries run in parallel: one database round trip instead of three.
+  const [item, bids, imageIds] = await Promise.all([getItem(id), getBids(id), getImageIds(id)]);
   if (!item) return res.status(404).render('notfound', { title: 'Not found' });
 
-  const bids = await getBids(id);
   const me = res.locals.user.id;
   const top = bids.find((b) => b.status !== 'rejected'); // the bid to beat
   const leader = bids.find((b) => b.status === 'accepted');
@@ -479,7 +481,7 @@ app.get('/item/:id', async (req, res) => {
     lowballedPrice: lowballs.length ? Math.min(...lowballs) : null,
     title: item.name,
     item,
-    imageIds: await getImageIds(id),
+    imageIds,
     bids,
     minBid,
     leaderId: leader?.id,

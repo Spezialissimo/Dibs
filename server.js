@@ -359,6 +359,8 @@ admin.post('/images/:id/move', async (req, res) => {
     }
     return img.item_id;
   });
+  // The photo manager reorders on screen and saves in the background: no page reload needed.
+  if (req.get('X-Requested-With') === 'fetch') return res.sendStatus(itemId ? 204 : 404);
   res.redirect(itemId ? `/admin/items/${itemId}#photos` : '/admin');
 });
 

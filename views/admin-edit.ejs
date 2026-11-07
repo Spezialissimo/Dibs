@@ -94,4 +94,44 @@
   </form>
 </div>
 
+<script>
+  // Reorder photos instantly: move the photo on screen, save in the background (in click order).
+  // Without JavaScript the buttons still work as normal form posts.
+  (() => {
+    const manager = document.querySelector('.photo-manager');
+    if (!manager) return;
+    let saving = Promise.resolve();
+
+    const refresh = () => {
+      const figures = [...manager.querySelectorAll('figure')];
+      figures.forEach((fig, i) => {
+        fig.querySelector('[value=left]').disabled = i === 0;
+        fig.querySelector('[value=right]').disabled = i === figures.length - 1;
+        fig.querySelector('img').alt = `Photo ${i + 1}`;
+        fig.querySelector('.cover-tag')?.remove();
+        if (i === 0) fig.querySelector('img').insertAdjacentHTML('afterend', '<span class="badge badge-dibs cover-tag">Cover</span>');
+      });
+    };
+
+    manager.querySelectorAll('form[action$="/move"]').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const dir = event.submitter?.value;
+        const fig = form.closest('figure');
+        const neighbour = dir === 'left' ? fig.previousElementSibling : fig.nextElementSibling;
+        if (!neighbour) return;
+        if (dir === 'left') neighbour.before(fig); else neighbour.after(fig);
+        refresh();
+        event.submitter.focus();
+
+        const body = new URLSearchParams({ dir });
+        saving = saving
+          .then(() => fetch(form.action, { method: 'POST', body, headers: { 'X-Requested-With': 'fetch' } }))
+          .then((res) => { if (!res.ok) throw new Error(res.status); })
+          .catch(() => location.reload()); // out of sync: show the real order
+      });
+    });
+  })();
+</script>
+
 <%- include('partials/footer') %>
